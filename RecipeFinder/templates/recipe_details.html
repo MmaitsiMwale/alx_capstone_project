@@ -1,0 +1,25 @@
+
+{% extends "layouts.html" %}
+
+{% block content %}
+    <div class="container">
+        {% if recipe_details %}
+            <div class="recipe-card">
+                <h2>{{ recipe_details.label }}</h2>
+                <img src="{{ recipe_details.image }}" alt="{{ recipe_details.label }}">
+                <h3>Ingredients</h3>
+                <ul>
+                    {% for ingredient in recipe_details.ingredientLines %}
+                        <li>{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+                <h3>Instructions</h3>
+                <p>{{ recipe_details.instructions }}</p>
+                <h3>Total Time</h3>
+                <p>{{ recipe_details.totalTime }} minutes</p>
+            </div>
+        {% else %}
+            <p>No recipe details available.</p>
+        {% endif %}
+    </div>
+{% endblock %}

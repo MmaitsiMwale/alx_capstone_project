@@ -1,0 +1,31 @@
+{% extends "layouts.html" %}
+
+{% block title %}Search - Recipe Finder{% endblock %}
+
+{% block header %}Search Results{% endblock %}
+
+{% block content %}
+  <form action="/search" method="GET">
+    <input type="text" name="query" placeholder="Search for recipes..." value="{{ request.args.get('query', '') }}">
+    <button type="submit">Search</button>
+  </form>
+
+  <section id="search-results">
+    {% if data %}
+      {% for hit in data['hits'] %}
+        <div class="recipe">
+          <h3>{{ hit['recipe']['label'] }}</h3>
+          <img src="{{ hit['recipe']['image'] }}" alt="{{ hit['recipe']['label'] }}">
+          <p>Cuisine: {{ hit['recipe']['cuisineType']|join(', ') if hit['recipe'].get('cuisineType') }}</p>
+          <p>Calories: {{ hit['recipe']['calories']|round }}</p>
+          <a href="{{ url_for('recipe_details', recipe_id=hit['recipe']['uri'].split('#')[1]) }}">View Details</a>
+          <form action="{{ url_for('add_to_favorites', recipe_id=hit['recipe']['uri'].split('#')[1]) }}" method="post">
+            <button type="submit">Add to Favorites</button>
+          </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No results found.</p>
+    {% endif %}
+  </section>
+{% endblock %}
