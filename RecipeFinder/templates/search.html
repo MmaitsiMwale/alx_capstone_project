@@ -10,10 +10,10 @@
     <button type="submit">Search</button>
   </form>
 
-  <section id="search-results">
+  <div class="recipe-grid">
     {% if data %}
       {% for hit in data['hits'] %}
-        <div class="recipe">
+        <div class="recipe-card">
           <h3>{{ hit['recipe']['label'] }}</h3>
           <img src="{{ hit['recipe']['image'] }}" alt="{{ hit['recipe']['label'] }}">
           <p>Cuisine: {{ hit['recipe']['cuisineType']|join(', ') if hit['recipe'].get('cuisineType') }}</p>
@@ -22,10 +22,17 @@
           <form action="{{ url_for('add_to_favorites', recipe_id=hit['recipe']['uri'].split('#')[1]) }}" method="post">
             <button type="submit">Add to Favorites</button>
           </form>
+
+          <!-- Display average rating -->
+          {% if hit['recipe']['uri'].split('#')[1] in recipe_ratings %}
+            <p>Average Rating: {{ (sum(recipe_ratings[hit['recipe']['uri'].split('#')[1]]) / len(recipe_ratings[hit['recipe']['uri'].split('#')[1]]))|round(1) }} Stars</p>
+          {% else %}
+            <p>No ratings yet</p>
+          {% endif %}
         </div>
       {% endfor %}
     {% else %}
       <p>No results found.</p>
     {% endif %}
-  </section>
+  </div>
 {% endblock %}

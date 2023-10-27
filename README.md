@@ -7,6 +7,7 @@ This is my capstone project to mark the completion of ALX SWE: Intro to Web Deve
 Project Folder Structure
 
 RecipeFinder/
+
 |-- static/
 |   |-- css/
 |   |   `-- styles.css

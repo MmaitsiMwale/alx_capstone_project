@@ -22,4 +22,29 @@
             <p>No recipe details available.</p>
         {% endif %}
     </div>
+
+
+<!-- Display average rating -->
+<section id="average-rating-section">
+    <h3>Average Rating</h3>
+    {% if recipe_details.uri.split('#')[1] in recipe_ratings %}
+        <p>{{ (sum(recipe_ratings[recipe_details.uri.split('#')[1]]) / len(recipe_ratings[recipe_details.uri.split('#')[1]]))|round(1) }} Stars</p>
+    {% else %}
+        <p>No ratings yet</p>
+    {% endif %}
+</section>
+<!-- Rating Section -->
+<section id="rating-section">
+    <h3>Rate this Recipe</h3>
+    <form action="{{ url_for('rate_recipe', recipe_id=recipe_details.uri.split('#')[1]) }}" method="POST">
+        <select name="rating">
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+        <button type="submit">Submit Rating</button>
+    </form>
+</section>
 {% endblock %}

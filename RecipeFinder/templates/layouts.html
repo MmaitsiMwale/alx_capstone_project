@@ -1,36 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recipe Finder</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/styles.css') }}" />
+  </head>
 
-<body>
+  <body>
     <header>
-        <h1>Fire Recipes</h1>
+      <h1>Fire Recipes</h1>
     </header>
 
     <nav>
-        <a href="{{ url_for('index') }}">Home</a> |
-        <a href="{{ url_for('search') }}">Search Recipes</a> |
-        <a href="{{ url_for('shopping_list') }}">My Shopping List</a> |
-        <a href="{{ url_for('recipe_details') }}">All Recipes</a> |
-        <a href="{{ url_for('favorites') }}">Favourites</a> 
+      <a href="{{ url_for('index') }}">Home</a> |
+      <a href="{{ url_for('search') }}">Search Recipes</a> |
+      <a href="{{ url_for('shopping_list') }}">My Shopping List</a> |
+      <a href="{{ url_for('recipe_details') }}">All Recipes</a> |
+      <a href="{{ url_for('favorites') }}">Favourites</a>
     </nav>
 
-    <hr>
+    <hr />
 
     <section>
-        {% block content %} 
-        {% endblock %}
+      {% block content %}
+
+      {% endblock %}
     </section>
 
     <footer>
-        <p class="subheading">© 2023 Recipe Finder. All Rights Reserved.</p>
+      <p class="subheading">© 2023 Recipe Finder. All Rights Reserved.</p>
     </footer>
-</body>
-
+  </body>
 </html>

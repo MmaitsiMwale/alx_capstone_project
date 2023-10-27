@@ -13,6 +13,9 @@ API_URL = "https://api.edamam.com/api/recipes/v2/"
 # In a real-world application, this data should be saved in a database.
 favorite_recipes = []
 
+# Dictionary to store ratings. In a real-world application, this data should be saved in a database.
+# The keys are recipe IDs, and the values are lists of ratings for that recipe.
+recipe_ratings = {}
 
 # Function to fetch recipes from Edamam API
 
@@ -112,7 +115,24 @@ def favorites():
     # Render the favorites.html template and pass in the list of favorite recipe objects
     return render_template('favorites.html', favorite_recipes=favorite_recipe_objects)
 
-# My Recipe List Page
+
+@app.route("/rate_recipe/<string:recipe_id>", methods=["POST"])
+def rate_recipe(recipe_id):
+    rating = request.form.get("rating")
+    if not rating:
+        return abort(400, "Rating is required.")
+
+    rating = float(rating)
+    if rating < 1 or rating > 5:
+        return abort(400, "Rating must be between 1 and 5.")
+
+    if recipe_id not in recipe_ratings:
+        recipe_ratings[recipe_id] = []
+
+    recipe_ratings[recipe_id].append(rating)
+    return redirect(url_for("recipe_details", recipe_id=recipe_id))
+
+# My Shopping List Page
 
 
 @app.route('/shopping_list')

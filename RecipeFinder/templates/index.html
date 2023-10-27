@@ -1,36 +1,34 @@
-{% extends "layouts.html" %}
+{% extends 'layouts.html' %}
 
-{% block title %}Home - Recipe Finder{% endblock %}
+{% block title %}
+  Home - Recipe Finder
+{% endblock %}
 
-{% block header %}Welcome to Recipe Finder{% endblock %}
+{% block header %}
+  Welcome to Recipe Finder
+{% endblock %}
 
 {% block content %}
   <form action="/search" method="GET">
-    <input type="text" name="query" placeholder="Search for recipes...">
+    <input type="text" name="query" placeholder="Search for recipes..." />
     <button type="submit">Search Recipe</button>
   </form>
-  <section id="featured-recipes">
-    
-    <!-- Featured recipes will go here -->
-    <div class="featured-recipes">
-        <h2>Featured Recipes</h2>
-        <div class="recipe-cards">
-            {% if featured_recipes %}
-                {% for recipe in featured_recipes %}
-                    <div class="recipe-card">
-                        <h3>{{ recipe.label }}</h3>
-                        <img src="{{ recipe.image }}" alt="{{ recipe.label }}">
-                        <a href="{{ url_for('recipe_details', recipe_id=recipe.uri.split('#')[1]) }}">View Details</a>
-                        <form action="{{ url_for('add_to_favorites', recipe_id=recipe.uri.split('#')[1]) }}" method="post">
-                            <button type="submit">Add to Favorites</button>
-                        </form>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No featured recipes available.</p>
-            {% endif %}
-        </div>
-    </div>
 
-  </section>
+  <div class="recipe-grid">
+    <h2>Featured Recipes</h2>
+    {% if featured_recipes %}
+      {% for recipe in featured_recipes %}
+        <div class="recipe-card">
+          <h3>{{ recipe.label }}</h3>
+          <img src="{{ recipe.image }}" alt="{{ recipe.label }}" />
+          <a href="{{ url_for('recipe_details', recipe_id = recipe.uri.split('#')[1]) }}">View Details</a>
+          <form action="{{ url_for('add_to_favorites', recipe_id = recipe.uri.split('#')[1]) }}" method="post">
+            <button type="submit">Add to Favorites</button>
+          </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No featured recipes available.</p>
+    {% endif %}
+  </div>
 {% endblock %}
