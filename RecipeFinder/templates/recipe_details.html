@@ -1,50 +1,62 @@
-
-{% extends "layouts.html" %}
+{% extends 'layouts.html' %}
 
 {% block content %}
-    <div class="container">
-        {% if recipe_details %}
-            <div class="recipe-card">
-                <h2>{{ recipe_details.label }}</h2>
-                <img src="{{ recipe_details.image }}" alt="{{ recipe_details.label }}">
-                <h3>Ingredients</h3>
-                <ul>
-                    {% for ingredient in recipe_details.ingredientLines %}
-                        <li>{{ ingredient }}</li>
-                    {% endfor %}
-                </ul>
-                <h3>Instructions</h3>
-                <p>{{ recipe_details.instructions }}</p>
-                <h3>Total Time</h3>
-                <p>{{ recipe_details.totalTime }} minutes</p>
-            </div>
-        {% else %}
-            <p>No recipe details available.</p>
-        {% endif %}
-    </div>
-
-
-<!-- Display average rating -->
-<section id="average-rating-section">
-    <h3>Average Rating</h3>
-    {% if recipe_details.uri.split('#')[1] in recipe_ratings %}
-        <p>{{ (sum(recipe_ratings[recipe_details.uri.split('#')[1]]) / len(recipe_ratings[recipe_details.uri.split('#')[1]]))|round(1) }} Stars</p>
+  <div class="container">
+    {% if recipe_details %}
+      <div class="recipe-card">
+        <h2>{{ recipe_details.label }}</h2>
+        <img src="{{ recipe_details.image }}" alt="{{ recipe_details.label }}" />
+        <h3>Ingredients</h3>
+        <ul>
+          {% for ingredient in recipe_details.ingredientLines %}
+            <li>{{ ingredient }}</li>
+          {% endfor %}
+        </ul>
+        <h3>Instructions</h3>
+        <ul>
+          {% for instruction in recipe_details.instructions %}
+            <li>{{ instruction }}</li>
+          {% endfor %}
+        </ul>
+        <h3>Total Time</h3>
+        <p>{{ recipe_details.totalTime }} minutes</p>
+      </div>
     {% else %}
-        <p>No ratings yet</p>
+      <p>No recipe details available.</p>
     {% endif %}
-</section>
-<!-- Rating Section -->
-<section id="rating-section">
-    <h3>Rate this Recipe</h3>
-    <form action="{{ url_for('rate_recipe', recipe_id=recipe_details.uri.split('#')[1]) }}" method="POST">
-        <select name="rating">
-            <option value="1">1 Star</option>
-            <option value="2">2 Stars</option>
-            <option value="3">3 Stars</option>
-            <option value="4">4 Stars</option>
-            <option value="5">5 Stars</option>
-        </select>
-        <button type="submit">Submit Rating</button>
+  </div>
+
+  <!-- Section to display reviews -->
+  <section id="reviews">
+    <h2>Reviews</h2>
+    {% if reviews %}
+      {% for review in reviews %}
+        <div class="review">
+          <p>User: {{ review.user_id }}</p>
+          <p>Review: {{ review.review_text }}</p>
+          <p>Rating: {{ review.rating }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No reviews yet. Be the first to review!</p>
+    {% endif %}
+  </section>
+
+  <!-- Section to submit a review -->
+  <section id="submit-review">
+    <h2>Submit Your Review</h2>
+    <form action="{{ url_for('rate_recipe', recipe_id = recipe_details.uri.split('#')[1]) }}" method="post">
+      <label for="review-text">Review:</label>
+      <textarea id="review-text" name="review_text"></textarea><br />
+      <label for="rating">Rating:</label>
+      <select id="rating" name="rating">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select><br />
+      <button type="submit">Submit Review</button>
     </form>
-</section>
+  </section>
 {% endblock %}

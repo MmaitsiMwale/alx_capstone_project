@@ -1,8 +1,51 @@
 from flask import Flask, render_template, request, abort, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 import requests
 import json
+import os
+from urllib.parse import quote_plus
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+pswd = "@JesusismyLord89"
+encrypted_pswd = quote_plus(pswd)
 app = Flask(__name__)
+
+# initialize db
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://ed:{encrypted_pswd}@localhost/RecipeFinder'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+
+# model DB
+
+class RecipeReviews(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    recipe_id = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.String(255), nullable=False)
+    review_text = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return f'<Rating {self.rating}'
+
+
+# Store Reviews
+
+def insert_review(recipe_id, user_id, review_text, rating):
+    new_review = RecipeReviews(recipe_id=recipe_id, user_id=user_id,
+                               review_text=review_text, rating=rating)
+    db.session.add(new_review)
+    db.session.commit()
+
+# fetch reviews by recipe_id
+
+
+def fetch_reviews_by_recipe_id(recipe_id):
+    return RecipeReviews.query.filter_by(recipe_id=recipe_id).all()
+
 
 # Your Edamam API credentials here
 APP_ID = "54dabdbd"
@@ -10,12 +53,8 @@ APP_KEY = "e7bf8594d6c614aea78e84528813c80a"
 API_URL = "https://api.edamam.com/api/recipes/v2/"
 
 # Global variable to hold favorite recipes.
-# In a real-world application, this data should be saved in a database.
 favorite_recipes = []
 
-# Dictionary to store ratings. In a real-world application, this data should be saved in a database.
-# The keys are recipe IDs, and the values are lists of ratings for that recipe.
-recipe_ratings = {}
 
 # Function to fetch recipes from Edamam API
 
@@ -60,7 +99,6 @@ def search():
 
 
 # Recipe Details Page
-
 @app.route('/recipe_details', defaults={'recipe_id': None})
 @app.route('/recipe_details/<string:recipe_id>')
 def recipe_details(recipe_id):
@@ -73,7 +111,11 @@ def recipe_details(recipe_id):
         if 'recipe' not in data:
             abort(404, description="Recipe details not found")
 
-        return render_template('recipe_details.html', recipe_details=data['recipe'])
+        # Fetch reviews for this recipe from the database
+        reviews = fetch_reviews_by_recipe_id(recipe_id)
+
+        return render_template('recipe_details.html', recipe_details=data['recipe'], reviews=reviews)
+
     except requests.RequestException as e:
         print(f"An error occurred while fetching recipe details: {e}")
         abort(500, description="Internal Server Error")
@@ -119,17 +161,29 @@ def favorites():
 @app.route("/rate_recipe/<string:recipe_id>", methods=["POST"])
 def rate_recipe(recipe_id):
     rating = request.form.get("rating")
+    # Assuming this field exists in your form
+    review_text = request.form.get("review_text")
+    user_id = "some_user_id"  # TODO: Get the user_id from your authentication system
+
     if not rating:
         return abort(400, "Rating is required.")
 
-    rating = float(rating)
+    try:
+        # Using int because your model defines rating as Integer
+        rating = int(rating)
+    except ValueError:
+        return abort(400, "Invalid rating value.")
+
     if rating < 1 or rating > 5:
         return abort(400, "Rating must be between 1 and 5.")
 
-    if recipe_id not in recipe_ratings:
-        recipe_ratings[recipe_id] = []
+    try:
+        insert_review(recipe_id, user_id, review_text, rating)
+    except Exception as e:
+        db.session.rollback()
+        print(f"An error occurred while adding the rating: {e}")
+        return abort(500, "Internal Server Error")
 
-    recipe_ratings[recipe_id].append(rating)
     return redirect(url_for("recipe_details", recipe_id=recipe_id))
 
 # My Shopping List Page

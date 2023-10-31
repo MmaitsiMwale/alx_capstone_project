@@ -3,16 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recipe Finder</title>
+    <title>
+      {% block title %}
+        Recipe Finder
+      {% endblock %}
+    </title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'css/styles.css') }}" />
   </head>
 
   <body>
-    <header>
+    <!-- Header -->
+    <header class="header">
       <h1>Fire Recipes</h1>
     </header>
 
-    <nav>
+    <!-- Navigation -->
+    <nav class="nav">
       <a href="{{ url_for('index') }}">Home</a> |
       <a href="{{ url_for('search') }}">Search Recipes</a> |
       <a href="{{ url_for('shopping_list') }}">My Shopping List</a> |
@@ -20,15 +26,15 @@
       <a href="{{ url_for('favorites') }}">Favourites</a>
     </nav>
 
-    <hr />
-
-    <section>
+    <!-- Content -->
+    <section class="container">
       {% block content %}
 
       {% endblock %}
     </section>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="footer">
       <p class="subheading">© 2023 Recipe Finder. All Rights Reserved.</p>
     </footer>
   </body>
