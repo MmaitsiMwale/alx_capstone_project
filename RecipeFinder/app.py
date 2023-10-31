@@ -2,16 +2,18 @@ from flask import Flask, render_template, request, abort, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import requests
 import json
-import os
 from urllib.parse import quote_plus
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+# get db pswd
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
-pswd = "@JesusismyLord89"
+pswd = config.get('DB_PASSWORD')
+
 encrypted_pswd = quote_plus(pswd)
 app = Flask(__name__)
 
-# initialize db
+# initialize db and credentials
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://ed:{encrypted_pswd}@localhost/RecipeFinder'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -19,8 +21,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-# model DB
-
+# create model DB
 class RecipeReviews(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     recipe_id = db.Column(db.String(255), nullable=False)
@@ -106,8 +107,9 @@ def recipe_details(recipe_id):
     try:
         response = requests.get(url)
         response.raise_for_status()
+        # convert response to dict like structure
         data = response.json()
-
+        # abort if recipe is not found in response
         if 'recipe' not in data:
             abort(404, description="Recipe details not found")
 
@@ -120,12 +122,16 @@ def recipe_details(recipe_id):
         print(f"An error occurred while fetching recipe details: {e}")
         abort(500, description="Internal Server Error")
 
+# functionality to add recipe to favorites
+
 
 @app.route('/add_to_favorites/<string:recipe_id>', methods=['POST'])
 def add_to_favorites(recipe_id):
     if recipe_id not in favorite_recipes:
         favorite_recipes.append(recipe_id)
     return redirect(url_for('favorites'))
+
+# functionality to remove recipe to favorites
 
 
 @app.route('/remove_from_favorites/<string:recipe_id>', methods=['POST'])
@@ -161,10 +167,8 @@ def favorites():
 @app.route("/rate_recipe/<string:recipe_id>", methods=["POST"])
 def rate_recipe(recipe_id):
     rating = request.form.get("rating")
-    # Assuming this field exists in your form
     review_text = request.form.get("review_text")
-    user_id = "some_user_id"  # TODO: Get the user_id from your authentication system
-
+    user_id = "some_user_id"  # default a user_id for dev purposes
     if not rating:
         return abort(400, "Rating is required.")
 
